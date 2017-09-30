@@ -1,5 +1,5 @@
 # Ramachandran-Angle-Probability.py
-===================================
+-----------------------------------
 
 A simple python class to generate random angles based on the angle density extracted experimental data. This class
 reads from a data file in (Py)Rosetta.
