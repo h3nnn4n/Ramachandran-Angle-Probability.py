@@ -24,8 +24,11 @@ A simple example that uses matplotlib to generate plots for each aminoacid and a
 
 To get a random angle for an amino acid one can use `phi, psi = rama.get_random_angle('T')`. Note that either the 1 or 3 letter name works.
 
+This program relies on data released with (Py)Rosetta. Rosetta can be found here and it is free for academic use: https://www.rosettacommons.org/
+
 
 LICENSE
 -------
 
-Check the LICENSE file.
+Only the files in this repository are released under the MIT liecense. Check the LICENSE file for more details.
+The files belonging to (Py)Rosetta have their own licenses.
