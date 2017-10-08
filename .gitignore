@@ -1,1 +1,6 @@
+*.png
+core
+*.swp
+*.swo
+*.dat
 __pycache__
