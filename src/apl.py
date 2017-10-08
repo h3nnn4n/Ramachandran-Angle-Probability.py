@@ -3,8 +3,8 @@
 
 import re
 import os
-import os.path
 import random
+import os.path
 import numpy as np
 
 
@@ -14,17 +14,42 @@ class APL():
         self.ss = set()
         self.aa = set()
 
+        self.size = 360
+        self.dx = 360 / self.size
+
+        self.names = {}
+
+        self.names['g'] = 'GLY'
+        self.names['a'] = 'ALA'
+        self.names['p'] = 'PRO'
+        self.names['s'] = 'SER'
+        self.names['c'] = 'CYS'
+        self.names['t'] = "THR"
+        self.names['v'] = 'VAL'
+        self.names['i'] = 'ILE'
+        self.names['l'] = 'LEU'
+        self.names['d'] = 'ASP'
+        self.names['n'] = 'ASN'
+        self.names['f'] = 'PHE'
+        self.names['y'] = 'TYR'
+        self.names['h'] = 'HIS'
+        self.names['w'] = 'TRP'
+        self.names['m'] = 'MET'
+        self.names['e'] = 'GLU'
+        self.names['q'] = 'GLN'
+        self.names['k'] = 'LYS'
+        self.names['r'] = 'ARG'
+
     def load(self, path="./apl"):
+        dx = self.dx
         if os.path.isdir(path):
-            size = 360
-            dx = 360 / size
             for _, _, fnames in os.walk(path):
                 for f in fnames:
                     sp = f.split('_')
                     self.aa.add(sp[0])
                     self.ss.add(sp[1])
                     key = (sp[0], sp[1])
-                    self.data[key] = np.zeros((size, size))
+                    self.data[key] = np.zeros((self.size, self.size))
 
                     p = path + "/" + f
 
@@ -42,7 +67,6 @@ class APL():
                                 y = round((psi + 180) / dx)
 
                                 self.data[key][x, y] = p
-                        break
 
         else:
             if path == "":
@@ -50,18 +74,56 @@ class APL():
             else:
                 raise Exception("Could not find: %s" % path)
 
-    def print(self):
-        k = (random.sample(self.aa, 1)[0], random.sample(self.ss, 1)[0])
+    def get_map(self, aa, ss):
+        if aa not in self.aa:
+            raise Exception("> %s < not found in the Aminoacid list" % aa)
 
-        for x in range(0, 360):
-            for y in range(0, 360):
-                print(x - 180, y - 180, self.data[k][x, y])
+        if ss not in self.ss:
+            raise Exception("> %s < not found in the secondary Structure list" % ss)
 
-            print()
+        k = (aa, ss)
+
+        return self.data[k]
+
+    def get_random_angle(self, aa, ss):
+        if len(aa) != 3:
+            aa = self.convert(aa)
+
+        k = (aa, ss)
+
+        r = random.random()
+        c = 0.0
+        x, y = 0, 0
+
+        while c < r and x < self.size and y < self.size:
+            x += 1
+            if x == self.size:
+                x = 0
+                y += 1
+
+            if y == 36:
+                y -= 1
+
+            c += self.data[k][x, y]
+
+        phi = (x * self.dx) - 180 + random.random() * self.dx
+        psi = (y * self.dx) - 180 + random.random() * self.dx
+
+        return (phi, psi)
+
+    def convert(self, name):
+        return self.aa[name.lower()].upper()
 
 
 if __name__ == "__main__":
     apl = APL()
     apl.load()
 
-    # apl.print()
+    # for _ in range(10):
+    #     print(apl.get_random_angle('GLU', 'T'))
+
+    import matplotlib.pyplot as plt
+    for k, v in apl.data.items():
+        print(k)
+        plt.imshow(v.transpose(), cmap='viridis', interpolation='nearest', origin="lower")
+        plt.savefig("%s_%s.png" % (k))
